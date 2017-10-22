@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"unicode"
 )
 
 const (
@@ -161,7 +162,7 @@ func exists(filename string) bool {
 
 func (v *returnsVisitor) Visit(node ast.Node) ast.Visitor {
 
-	file, ok := node.(*ast.File)
+	astFile, ok := node.(*ast.File)
 	if !ok {
 		return v
 	}
@@ -172,12 +173,13 @@ func (v *returnsVisitor) Visit(node ast.Node) ast.Visitor {
 	}
 
 	var importAliases []importAlias
-	for i, pkgImport := range file.Imports {
+	for i, pkgImport := range astFile.Imports {
 		if pkgImport.Name != nil && pkgImport.Name.Name != "_" {
 			alias := importAlias{
 				importSpec: pkgImport,
 				index:      i,
 			}
+
 			importAliases = append(importAliases, alias)
 		}
 	}
@@ -185,39 +187,64 @@ func (v *returnsVisitor) Visit(node ast.Node) ast.Visitor {
 	switch len(importAliases) {
 	case 0:
 
-	case 1:
-		file := v.f.File(importAliases[0].importSpec.Pos())
-		lineNumber := file.Position(importAliases[0].importSpec.Pos()).Line
-		// dot imports inside of tests are okay
-		if importAliases[0].importSpec.Name.Name == "." && strings.HasSuffix(file.Name(), "_test.go") {
-			break
-		}
-		log.Printf("unnecessary import alias %v:%v %v\n", file.Name(), lineNumber, importAliases[0].importSpec.Name.Name)
-
 	default:
 		// verify that each alias is needed by making a second pass through the imports
 		for _, importAlias := range importAliases {
 			var aliasNeeded bool
-			for i, pkgImport := range file.Imports {
-				// Since we know the index of the import alias in file.Imports from our first pass, we can save a string comparison
+			file := v.f.File(importAlias.importSpec.Pos())
+			lineNumber := file.Position(importAlias.importSpec.Pos()).Line
+			for i, pkgImport := range astFile.Imports {
+				// Since we know the index of the import alias in astFile.Imports from our first pass, we can save a string comparison
 				if i == importAlias.index {
 					continue
 				}
-				if pkgImport.Path != nil && strings.Replace(path.Base(pkgImport.Path.Value), `"`, "", -1) == strings.Replace(path.Base(importAlias.importSpec.Path.Value), `"`, "", -1) {
-					// this alias is needed, continue
+				// save this off so we can potentially check for uppercase letters below
+				basePkgImport := strings.Replace(path.Base(pkgImport.Path.Value), `"`, "", -1)
+				if pkgImport.Path != nil && basePkgImport == strings.Replace(path.Base(importAlias.importSpec.Path.Value), `"`, "", -1) {
+					// this alias is needed
 					aliasNeeded = true
+
+					// before continuing, ensure it does not contain any uppercase letters or underscores
+
+					// we can immediately return if we have a dot import
+					if importAlias.importSpec.Name.Name == "." {
+						break
+					}
+
+					// Check for uppercase letters
+					x := 0
+				upperLoop:
+					for s := basePkgImport; s != ""; s = s[x:] {
+						l := strings.IndexFunc(s[1:], unicode.IsUpper)
+
+						if l < 0 {
+							log.Printf("%v:%v import alias %v contains uppercase letter\n", file.Name(), lineNumber, importAlias.importSpec.Name.Name)
+							break upperLoop
+						}
+						x++
+					}
+
+					// Check for underscores
+					if importAlias.importSpec.Name.Name == "ex_act" {
+						if strings.Contains(importAlias.importSpec.Name.Name, "_") {
+							log.Printf("%v:%v import alias %v contains underscore\n", file.Name(), lineNumber, importAlias.importSpec.Name.Name)
+						} else {
+							log.Println("no")
+						}
+
+					}
+
+					// We can now break, this alias is needed and has been flagged if necessary
 					break
 				}
 
 			}
 			if !aliasNeeded {
-				file := v.f.File(importAlias.importSpec.Pos())
-				lineNumber := file.Position(importAlias.importSpec.Pos()).Line
 				// dot imports inside of tests are okay
 				if importAliases[0].importSpec.Name.Name == "." && strings.HasSuffix(file.Name(), "_test.go") {
 					continue
 				}
-				log.Printf("unnecessary import alias %v:%v %v\n", file.Name(), lineNumber, importAlias.importSpec.Name.Name)
+				log.Printf("%v:%v unnecessary import alias %v\n", file.Name(), lineNumber, importAlias.importSpec.Name.Name)
 			}
 		}
 	}
