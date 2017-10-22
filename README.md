@@ -21,7 +21,7 @@ As noted in Go's [Code Review comments](https://github.com/golang/go/wiki/CodeRe
 > Avoid renaming imports except to avoid a name collision; good package names should not require renaming. 
 > In the event of collision, prefer to rename the most local or project-specific import.
 
-This tool will check if any import aliases are truly needed (by ensuring there is a name collision that would exist without the mport alias). Furthermore, unimport will flag any use of the [import dot](https://github.com/golang/go/wiki/CodeReviewComments#import-dot) outside of test files.
+This tool will check if any import aliases are truly needed (by ensuring there is a name collision that would exist without the mport alias).
 
 ## Example
 
