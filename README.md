@@ -27,7 +27,7 @@ This tool will check if any import aliases are truly needed (by ensuring there i
 
 Running `unimports` on the [Go source](https://github.com/golang/go):
 
-```Bash
+```
 $ unimport $GOROOT/src/...
 cmd/go/pkg.go:18 unnecessary import alias pathpkg
 go/build/build.go:19 unnecessary import alias pathpkg
