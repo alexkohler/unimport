@@ -29,11 +29,11 @@ Running `unimports` on the [Go source](https://github.com/golang/go):
 
 ```Bash
 $ unimport $GOROOT/src/...
-unnecessary import alias cmd/go/pkg.go:18 pathpkg
-unnecessary import alias go/build/build.go:19 pathpkg
-unnecessary import alias go/internal/gcimporter/gcimporter.go:23 exact
-unnecessary import alias os/pipe_test.go:14 osexec
-unnecessary import alias os/os_windows_test.go:10 osexec
+cmd/go/pkg.go:18 unnecessary import alias pathpkg
+go/build/build.go:19 unnecessary import alias pathpkg
+go/internal/gcimporter/gcimporter.go:23 unnecessary import alias exact
+os/pipe_test.go:14 unnecessary import alias osexec
+os/os_windows_test.go:10 unnecessary import alias osexec
 ```
 
 Below are some of the arguably unneeded import aliases it found:
@@ -100,9 +100,9 @@ import (
 
 ## TODO
 
-- Unit tests (may require some refactoring to do correctly)
+- Unit tests
+- Flagging of packages that contain an uppercase letter or underscore
 - -w flag to write changes to file where/if possible
-- Vim quickfix format?
 - Globbing support (e.g. unimport *.go)
 
 
