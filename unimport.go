@@ -185,15 +185,6 @@ func (v *returnsVisitor) Visit(node ast.Node) ast.Visitor {
 	switch len(importAliases) {
 	case 0:
 
-	case 1:
-		file := v.f.File(importAliases[0].importSpec.Pos())
-		lineNumber := file.Position(importAliases[0].importSpec.Pos()).Line
-		// dot imports inside of tests are okay
-		if importAliases[0].importSpec.Name.Name == "." && strings.HasSuffix(file.Name(), "_test.go") {
-			break
-		}
-		log.Printf("unnecessary import alias %v:%v %v\n", file.Name(), lineNumber, importAliases[0].importSpec.Name.Name)
-
 	default:
 		// verify that each alias is needed by making a second pass through the imports
 		for _, importAlias := range importAliases {
@@ -217,7 +208,11 @@ func (v *returnsVisitor) Visit(node ast.Node) ast.Visitor {
 				if importAliases[0].importSpec.Name.Name == "." && strings.HasSuffix(file.Name(), "_test.go") {
 					continue
 				}
-				log.Printf("unnecessary import alias %v:%v %v\n", file.Name(), lineNumber, importAlias.importSpec.Name.Name)
+				// If the alias path contains a dash or dot, it's likely importing a specific revision - ignore these
+				if strings.Contains(importAliases[0].importSpec.Path.Value, "-") || strings.Contains(importAliases[0].importSpec.Path.Value, ".") {
+					continue
+				}
+				log.Printf("%v:%v unnecessary import alias %v\n", file.Name(), lineNumber, importAlias.importSpec.Name.Name)
 			}
 		}
 	}

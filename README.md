@@ -21,7 +21,7 @@ As noted in Go's [Code Review comments](https://github.com/golang/go/wiki/CodeRe
 > Avoid renaming imports except to avoid a name collision; good package names should not require renaming. 
 > In the event of collision, prefer to rename the most local or project-specific import.
 
-This tool will check if any import aliases are truly needed (by ensuring there is a name collision that would exist without the mport alias).
+This tool will check if any import aliases are truly needed (by ensuring there is a name collision that would exist without the mport alias). This tool _will_ ignore import paths containing dashes and dots, as these are generally useful aliases while importing a specific revision. E.g. in [gometalinter](https://github.com/alecthomas/gometalinter), there are some imports like `kingpin "gopkg.in/alecthomas/kingpin.v3-unstable"`. This is a reasonable import alias and will not be flagged.
 
 ## Example
 
