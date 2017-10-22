@@ -29,15 +29,74 @@ Running `unimports` on the [Go source](https://github.com/golang/go):
 
 ```Bash
 $ unimport $GOROOT/src/...
-//TODO finish
+unnecessary import alias cmd/go/pkg.go:18 pathpkg
+unnecessary import alias go/build/build.go:19 pathpkg
+unnecessary import alias go/internal/gcimporter/gcimporter.go:23 exact
+unnecessary import alias os/pipe_test.go:14 osexec
+unnecessary import alias os/os_windows_test.go:10 osexec
 ```
 
-Below is... //TODO
+Below are some of the arguably unneeded import aliases it found:
 
 
 ```Go
-//TODO
+
+// go/build/build.go
+import (                                                                                       
+    "bytes"                                                                                    
+    "errors"                                                                                   
+    "fmt"                                                                                      
+    "go/ast"                                                                                   
+    "go/doc"                                                                                   
+    "go/parser"                                                                                
+    "go/token"                                                                                 
+    "io"                                                                                       
+    "io/ioutil"                                                                                
+    "log"                                                                                      
+    "os"                                                                                       
+    pathpkg "path"                                                                             
+    "path/filepath"                                                                            
+    "runtime"                                                                                  
+    "sort"                                                                                     
+    "strconv"                                                                                  
+    "strings"                                                                                  
+    "unicode"                                                                                  
+    "unicode/utf8"                                                                             
+) 
+
+// go/internal/gcimporter/gcimporter.go
+import (                                                                                       
+    "bufio"                                                                                    
+    "errors"                                                                                   
+    "fmt"                                                                                      
+    "go/build"                                                                                 
+    "go/token"                                                                                 
+    "io"                                                                                       
+    "io/ioutil"                                                                                
+    "os"                                                                                       
+    "path/filepath"                                                                            
+    "sort"                                                                                     
+    "strconv"                                                                                  
+    "strings"                                                                                  
+    "text/scanner"                                                                             
+                                                                                               
+    exact "go/constant"                                                                        
+    "go/types"                                                                                 
+)
+
+
+// os/pipe_test.go.go
+import (                                                                                       
+    "fmt"                                                                                      
+    "internal/testenv"                                                                         
+    "os"                                                                                       
+    osexec "os/exec"                                                                           
+    "os/signal"                                                                                
+    "syscall"                                                                                  
+    "testing"                                                                                  
+)
 ```
+
 
 ## TODO
 
