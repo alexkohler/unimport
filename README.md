@@ -41,29 +41,6 @@ Below are some of the arguably unneeded import aliases it found:
 
 ```Go
 
-// go/build/build.go
-import (                                                                                       
-    "bytes"                                                                                    
-    "errors"                                                                                   
-    "fmt"                                                                                      
-    "go/ast"                                                                                   
-    "go/doc"                                                                                   
-    "go/parser"                                                                                
-    "go/token"                                                                                 
-    "io"                                                                                       
-    "io/ioutil"                                                                                
-    "log"                                                                                      
-    "os"                                                                                       
-    pathpkg "path"                                                                             
-    "path/filepath"                                                                            
-    "runtime"                                                                                  
-    "sort"                                                                                     
-    "strconv"                                                                                  
-    "strings"                                                                                  
-    "unicode"                                                                                  
-    "unicode/utf8"                                                                             
-) 
-
 // go/internal/gcimporter/gcimporter.go
 import (                                                                                       
     "bufio"                                                                                    
