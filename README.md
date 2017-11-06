@@ -87,3 +87,5 @@ import (
 
 Pull requests welcome!
 
+- [nakedret](https://github.com/alexkohler/nakedret) - Finds naked returns.
+- [prealloc](https://github.com/alexkohler/prealloc) - Finds slice declarations that could potentially be preallocated.
